@@ -30,8 +30,9 @@ main proc
 	CALL		introduction
 	PUSH		OFFSET request ;passing value by reference so it can be modified when getData returns a user validated value.
 	CALL		getData
-	PUSH		request
+	CALL		Randomize    ;IS THIS OKAY TO CALL HERE? SINCE I MODIFY THE STACK FRAME.
 	PUSH		OFFSET array
+	PUSH		request
 	CALL		fillArray
 
 	invoke ExitProcess,0
@@ -87,6 +88,33 @@ fillArray	 PROC
 	PUSH		EBP
 	MOV			EBP,ESP
 
+
+;Then
+	MOV			EDI,[EBP+12] ;Move array parameter to the EDI register.
+	MOV			ECX,[EBP+8] ;Bring the counter in to the ECX register.
+
+
+	continue:
+		;Code to generate a random numbers goes here.
+		MOV			EAX,900
+		CALL		RandomRange
+		ADD			EAX,LO
+		MOV			EDI,EAX ;Moves random int from EAX into EDI referenced as value.
+		CALL		WriteDec ;TESTING random number generation.
+		CALL		CrlF;TESTING
+
+
+		;Move through each element
+		;MOV			[EDI],EAX
+		ADD			EDI,4
+		LOOP		continue
+
+	POP			EBP
+	RET			8
+
+
+
+
 fillArray	 ENDP
 
 sortList	 PROC
@@ -94,6 +122,7 @@ sortList	 PROC
 ;Procedure starter kit
 	PUSH		EBP
 	MOV			EBP,ESP
+
 
 sortList	 ENDP
 
@@ -117,6 +146,14 @@ displayList	  PROC
 
 displayList	  ENDP
 
+
+xChange	  PROC
+;This procedure will 
+;Procedure starter kit
+	PUSH		EBP
+	MOV			EBP,ESP
+
+xChange	  ENDP
 
 
 
