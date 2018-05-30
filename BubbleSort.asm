@@ -1,5 +1,12 @@
-; Program template
+TITLE Program 5     (BubbleSort.asm)
 
+; Kingsley Bawuah
+;kbawuah@oregonstate.edu
+; CS-271-400
+; 05/28/18
+; Program 5
+; Description: This program prints out a random list of user requested numbers, then sorts them and displays them with the median of the values.. DUE: 05/28/18
+ ;Refrences : Code from Lectures 18-19 and Bubble sort from Irvine Page 373
 .386
 .model flat,stdcall
 .stack 4096
@@ -15,20 +22,19 @@ INCLUDE Irvine32.inc
 	TWO						=		2
 
 .data
-	; declare variables here
 
 	programGreeting			BYTE	"Hello, this is Kingsley and this is programming assignment of 5!",0
 	instruction				BYTE	"Please enter a number between 10 and 200, and i will generate random integers in a range of 100 - 999. I will then sort the numbers in descending order, display them and the median value which will be rounded to the nearest integer",0
-	unsortText				BYTE	"The unsorted numbers are : ",0
-	sortText				BYTE	"The sorted numbers are : ",0
-	medianText				BYTE	"The median of the list of generated numbers is: ",0
+	unsortText				BYTE	"The unsorted list of random numbers  : ",0
+	sortText				BYTE	"The sorted list of numbers (Descending) : ",0
+	medianText				BYTE	"The median of the list of random numbers is: ",0
 	wordSpace				BYTE	"   ",0
 	request					DWORD	?
 	array					DWORD	MAX		DUP(?)
+	insideLCount			DWORD	?
 
 .code
 main proc
-	; write your code here
 
 	CALL		introduction
 	PUSH		OFFSET request ;passing value by reference so it can be modified when getData returns a user validated value.
@@ -37,9 +43,25 @@ main proc
 	PUSH		OFFSET array
 	PUSH		request
 	CALL		fillArray
+	CALL		CrlF
+	MOV			EDX, OFFSET unsortText
+	CALL		WriteString
+	CALL		CrlF
 	PUSH		OFFSET array
 	PUSH		request
 	CALL		displayList
+
+	PUSH		OFFSET array
+	PUSH		request
+	CALL		sortList
+	CALL		CrlF
+	MOV			EDX, OFFSET sortText
+	CALL		WriteString
+	CALL		CrlF
+	PUSH		OFFSET array
+	PUSH		request
+	CALL		displayList
+
 	PUSH		OFFSET array
 	PUSH		request
 	CALL		displayMedian
@@ -60,7 +82,7 @@ introduction PROC
 introduction ENDP
 
 
-;Display instructions to user and validate entered number.
+;Display instructions to user and validate entered number. Accepts no paramaters.
 getData		 PROC
 
 	;Procedure starter kit
@@ -91,6 +113,8 @@ getData		 PROC
 
 getData		 ENDP
 
+
+;fillArray is passed the Array by reference and Request by value.
 fillArray	 PROC
 
 ;Procedure starter kit
@@ -112,7 +136,6 @@ fillArray	 PROC
 
 
 		;Move through each element
-		;MOV			[EDI],EAX
 		ADD			EDI,4
 		LOOP		continue
 
@@ -124,15 +147,45 @@ fillArray	 PROC
 
 fillArray	 ENDP
 
+;sortList is passed the Array by reference and Request by value.
 sortList	 PROC
 
 ;Procedure starter kit
 	PUSH		EBP
 	MOV			EBP,ESP
 
+	
 
+	;Set up outer counter.
+	MOV			ECX,[EBP+8] ;Bring the counter in to the ECX register
+
+	DEC			ECX
+
+	L1:
+	;This will save the outer loop counter.
+	PUSH ECX
+	MOV			EDI,[EBP+12] ;Move array parameter to thge EDI register.
+
+	; Take array value and do comparisons and or exhange values.
+	L2: 
+	MOV			EAX,[EDI]
+	CMP			[EDI+4],EAX
+	Jl			L3
+	XCHG		EAX,[EDI+4]
+	MOV			[EDI],EAX
+	;Proceed through the array
+	L3: 
+	ADD			EDI,4
+	LOOP		L2
+	;Loop Control.
+	POP			ECX
+	LOOP		L1
+	L4:
+	POP			EBP
+	RET			8
 sortList	 ENDP
 
+;displayMedian is passed the Array by reference and Request by value.
 displayMedian PROC
 
 
@@ -149,13 +202,25 @@ displayMedian PROC
 	MOV			ECX,[EBP+8] ;Bring the counter in to the ECX register.
 
 ;Divide request in half to find median.
-
 	MOV		EAX, ECX
 	CDQ
-	MOV		EDX,2
-	CDQ		;This is causing 0 to be placed in EDX. why?
-	DIV		EDX
+	MOV		EBX,2
+	CDQ		
+	DIV		EBX
+	DEC		EAX
+	MOV		EDX,4
+	IMUL	EAX,EDX
+	ADD		EDI,EAX
+	MOV		EAX,[EDI]
+	CALL	CrlF
+	MOV		EDX,OFFSET medianText
+	CALL	WriteString
+	CALL	WriteInt ;median will still be in EAX.
+	CALL	CrlF
 
+
+
+;Ends the procedure.
 	POP		EBP
 	RET		
 
@@ -173,7 +238,7 @@ displayList	  PROC
 
 ;Then
 	MOV			EDI,[EBP+12] ;Move array parameter to the EDI register.
-	MOV			ECX,[EBP+8] ;Bring the counter in to the ECX register
+	MOV			ECX,[EBP+8] ;Bring the counter in to the ECX register.
 	MOV			EBX,9 ;Move line counter to EBX
 
 
@@ -209,13 +274,6 @@ displayList	  PROC
 displayList	  ENDP
 
 
-xChange	  PROC
-;This procedure will 
-;Procedure starter kit
-	PUSH		EBP
-	MOV			EBP,ESP
-
-xChange	  ENDP
 
 
 
