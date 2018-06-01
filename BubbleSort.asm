@@ -1,12 +1,8 @@
-TITLE Program 5     (BubbleSort.asm)
+TITLE Bubble Sort  (BubbleSort.asm)
 
 ; Kingsley Bawuah
-;kbawuah@oregonstate.edu
-; CS-271-400
-; 05/28/18
-; Program 5
-; Description: This program prints out a random list of user requested numbers, then sorts them and displays them with the median of the values.. DUE: 05/28/18
- ;Refrences : Code from Lectures 18-19 and Bubble sort from Irvine Page 373
+; Description: This program prints out a random list of user requested numbers between a range, then sorts them and displays them with the median of the values.. Written for CS 271.
+
 .386
 .model flat,stdcall
 .stack 4096
@@ -163,7 +159,7 @@ sortList	 PROC
 
 	L1:
 	;This will save the outer loop counter.
-	PUSH ECX
+	PUSH		ECX
 	MOV			EDI,[EBP+12] ;Move array parameter to thge EDI register.
 
 	; Take array value and do comparisons and or exhange values.
